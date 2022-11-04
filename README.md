@@ -1,4 +1,4 @@
-# networkx-to-lava-nc
+# SNN Radiation
 
 This applies different simulated radiation effects into incoming spiking neural
 networks (SNNs).
@@ -12,7 +12,7 @@ brain-adaptation mechanisms applied to these algorithms, in order to increase
 their radiation robustness. You can run it on various backends, as well as on
 a custom LIF-neuron simulator.
 
-## Algorithms
+## Supported Radiation Types
 
 Different forms of radiation effects may be simulated using this software. This
 allows different chip-makers to analyse and improve the radiation robustness of
