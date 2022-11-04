@@ -1,16 +1,21 @@
-# SNN Radiation
+# Radiation Effect Simulation on Spiking Neural Network
+
+[![Python 3.10][python_badge]](https://www.python.org/downloads/release/python-3106/)
+[![License: AGPL v3][agpl3_badge]](https://www.gnu.org/licenses/agpl-3.0)
+[![Code Style: Black][black_badge]](https://github.com/ambv/black)
+[![Code Coverage][codecov_badge]](https://codecov.io/gh/a-t-0/snnalgos)
 
 This applies different simulated radiation effects into incoming spiking neural
 networks (SNNs).
 
 ## Parent Repository
 
-These effects of the radaition, and respective SNN performance, can be analysed
-using [this parent repository](https://github.com/a-t-0/snncompare).
+These effects of the radiation, and respective SNN performance, can be analysed
+using [this parent repository].
 Together, these repos can be used to investigate the effectivity of various
-brain-adaptation mechanisms applied to these algorithms, in order to increase
-their radiation robustness. You can run it on various backends, as well as on
-a custom LIF-neuron simulator.
+[brain-adaptation] mechanisms applied to these algorithms, in order to increase
+their \[radiation\] robustness. You can run it on various [backends], as well
+as on a custom LIF-neuron simulator.
 
 ## Supported Radiation Types
 
@@ -34,3 +39,11 @@ Feel free to send pull requests for compatibility with different:
 | Minimum Dominating Set Approximation | Sparse   | Redundancy | Neuron Death |
 |                                      |          |            |              |
 |                                      |          |            |              |
+
+[agpl3_badge]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
+[backends]: https://github.com/a-t-0/snnbackends
+[black_badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[brain-adaptation]: https://github.com/a-t-0/snnadaptation
+[codecov_badge]: https://codecov.io/gh/a-t-0/snn/branch/main/graph/badge.svg
+[python_badge]: https://img.shields.io/badge/python-3.10-blue.svg
+[this parent repository]: https://github.com/a-t-0/snncompare
