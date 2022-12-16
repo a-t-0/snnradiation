@@ -186,7 +186,6 @@ class Radiation_damage:
         for node_name in dead_node_names:
             if node_name in dead_node_names:
                 get_degree.nodes[node_name]["nx_lif"][0].vth.set(9999)
-                print(f"node_name={node_name}")
 
 
 @typechecked
