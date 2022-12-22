@@ -22,20 +22,6 @@ class Radiation_damage:
         )
 
     @typechecked
-    def get_random_list_of_len_n(self, n: int, max_val: int) -> List[int]:
-        """Does not include max, only below.
-
-        :param n:
-        :param max_val:
-        """
-        randomlist = []
-        for _ in range(int(0), int(n)):
-            n = random.randint(0, max_val)  # nosec - using a random seed.
-        randomlist.append(n)
-
-        return randomlist
-
-    @typechecked
     def inject_simulated_radiation(
         self, get_degree: nx.DiGraph, probability: float, seed: int
     ) -> List[str]:
@@ -45,9 +31,6 @@ class Radiation_damage:
         :param probability:
 
         """
-        # Get list of dead neurons.
-        # dead_neurons = self.get_list_of_dead_neurons(get_degree)
-
         # Get random neurons from list.
         dead_neuron_names = self.get_random_neurons(
             get_degree, probability, seed
@@ -94,82 +77,7 @@ class Radiation_damage:
                 dead_neuron_names.append(nodename)
             count = count + 1
 
-        # for node_name in get_degree:
-        # if self.kill_neuron(probability):
-        # dead_neuron_names.append(node_name)
         return dead_neuron_names
-
-    @typechecked
-    def kill_neuron(self, probability: float) -> bool:
-        """probabiltiy: 0 to 1 (exc. 1)
-        Returns bool true or false
-
-        :param probability:
-
-        """
-
-        return random.random() < probability  # nosec - using a random seed.
-
-    @typechecked
-    def get_list_of_dead_neurons(self, get_degree: nx.DiGraph) -> List[str]:
-        """
-
-        :param get_degree: Graph with the MDSA SNN approximation solution.
-
-        """
-        spike_once_neurons = self.get_spike_once_nodes(get_degree)
-        self.get_selector_nodes(get_degree)
-        self.get_degree_receiver_nodes(get_degree)
-        return spike_once_neurons
-
-    @typechecked
-    def get_spike_once_nodes(self, get_degree: nx.DiGraph) -> List[str]:
-        """
-
-        :param get_degree: Graph with the MDSA SNN approximation solution.
-        :param m: The amount of approximation iterations used in the MDSA
-        approximation.  (Default value = None)
-
-        """
-        spike_once_nodes = []
-        for node_name in get_degree.nodes:
-            if node_name[:11] == "spike_once_":
-                spike_once_nodes.append(node_name)
-        return spike_once_nodes
-
-        # vth = get_degree.nodes[node_name]["vth"] + 1
-        # if node_name == "spike_once_0":
-        #    vth = 9999
-
-    @typechecked
-    def get_degree_receiver_nodes(self, get_degree: nx.DiGraph) -> List[str]:
-        """
-
-        :param get_degree: Graph with the MDSA SNN approximation solution.
-        :param m: The amount of approximation iterations used in the MDSA
-        approximation.  (Default value = None)
-
-        """
-        degree_receiver_nodes = []
-        for node_name in get_degree.nodes:
-            if node_name[:16] == "degree_receiver_":
-                degree_receiver_nodes.append(node_name)
-        return degree_receiver_nodes
-
-    @typechecked
-    def get_selector_nodes(self, get_degree: nx.DiGraph) -> List[str]:
-        """
-
-        :param get_degree: Graph with the MDSA SNN approximation solution.
-        :param m: The amount of approximation iterations used in the MDSA
-        approximation.  (Default value = None)
-
-        """
-        selector_nodes = []
-        for node_name in get_degree.nodes:
-            if node_name[:9] == "selector_":
-                selector_nodes.append(node_name)
-        return selector_nodes
 
     @typechecked
     def kill_neurons(
