@@ -13,7 +13,6 @@ class Radiation_config:
 
     @typechecked
     def __init__(self, dummy_config: Dict) -> None:
-
         for some_property, value in dummy_config.items():
             if some_property == "some_vals":
                 # Verify type of parameters
