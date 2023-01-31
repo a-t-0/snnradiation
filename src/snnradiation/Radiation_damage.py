@@ -36,7 +36,9 @@ class Radiation_damage:
             get_degree, probability, seed
         )
 
-        store_dead_neuron_names_in_graph(get_degree, dead_neuron_names)
+        store_dead_neuron_names_in_graph(
+            G=get_degree, dead_neuron_names=dead_neuron_names
+        )
 
         # Kill neurons.
         self.kill_neurons(get_degree, dead_neuron_names)
@@ -70,11 +72,11 @@ class Radiation_damage:
         dead_neuron_names = []
         # TODO: fold instead of for.
         count = 0
-        for nodename in get_degree:
+        for node_name in get_degree:
 
             # for i,node_name in enumerate(get_degree):
             if count in rand_indices:
-                dead_neuron_names.append(nodename)
+                dead_neuron_names.append(node_name)
             count = count + 1
 
         return dead_neuron_names
@@ -98,7 +100,7 @@ class Radiation_damage:
 
 @typechecked
 def store_dead_neuron_names_in_graph(
-    G: nx.DiGraph, dead_neuron_names: List[str]
+    *, G: nx.DiGraph, dead_neuron_names: List[str]
 ) -> None:
     """
 
@@ -107,33 +109,33 @@ def store_dead_neuron_names_in_graph(
 
     """
 
-    for nodename in G.nodes:
-        if nodename in dead_neuron_names:
-            G.nodes[nodename]["rad_death"] = True
+    for node_name in G.nodes:
+        if node_name in dead_neuron_names:
+            G.nodes[node_name]["rad_death"] = True
         else:
-            G.nodes[nodename]["rad_death"] = False
+            G.nodes[node_name]["rad_death"] = False
 
 
 @typechecked
 def verify_radiation_is_applied(
-    some_graph: nx.DiGraph, dead_neuron_names: List[str], rad_type: str
+    *, some_graph: nx.DiGraph, dead_neuron_names: List[str], rad_type: str
 ) -> None:
     """Goes through the dead neuron names, and verifies the radiation is
     applied correctly."""
 
     # TODO: include check to see if store_dead_neuron_names_in_graph is
-    # executed correctly by checking whether the:G.nodes[nodename]["rad_death"]
-    # = True
+    # executed correctly by checking whether the:
+    # G.nodes[node_name]["rad_death"] = True
     if rad_type == "neuron_death":
-        for nodename in some_graph:
-            if nodename in dead_neuron_names:
-                if not some_graph.nodes[nodename]["rad_death"]:
+        for node_name in some_graph:
+            if node_name in dead_neuron_names:
+                if not some_graph.nodes[node_name]["rad_death"]:
                     raise Exception(
-                        'Error, G.nodes[nodename]["rad_death"] not set'
+                        'Error, G.nodes[node_name]["rad_death"] not set'
                     )
-                if some_graph.nodes[nodename]["nx_lif"][0].vth.get() != 9999:
+                if some_graph.nodes[node_name]["nx_lif"][0].vth.get() != 9999:
                     raise Exception(
-                        "Error, radiation is not applied to:{nodename}, even"
+                        "Error, radiation is not applied to:{node_name}, even"
                         + f" though it is in:{dead_neuron_names}"
                     )
     else:
