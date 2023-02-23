@@ -73,7 +73,6 @@ class Radiation_damage:
         # TODO: fold instead of for.
         count = 0
         for node_name in get_degree:
-
             # for i,node_name in enumerate(get_degree):
             if count in rand_indices:
                 dead_neuron_names.append(node_name)
@@ -130,15 +129,15 @@ def verify_radiation_is_applied(
         for node_name in some_graph:
             if node_name in dead_neuron_names:
                 if not some_graph.nodes[node_name]["rad_death"]:
-                    raise Exception(
+                    raise ValueError(
                         'Error, G.nodes[node_name]["rad_death"] not set'
                     )
                 if some_graph.nodes[node_name]["nx_lif"][0].vth.get() != 9999:
-                    raise Exception(
+                    raise ValueError(
                         "Error, radiation is not applied to:{node_name}, even"
                         + f" though it is in:{dead_neuron_names}"
                     )
     else:
-        raise Exception(
+        raise NotImplementedError(
             f"Error, radiation type: {rad_type} is not yet supported."
         )
