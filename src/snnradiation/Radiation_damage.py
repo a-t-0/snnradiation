@@ -134,7 +134,7 @@ def verify_radiation_is_applied(
                     )
                 if some_graph.nodes[node_name]["nx_lif"][0].vth.get() != 9999:
                     raise ValueError(
-                        "Error, radiation is not applied to:{node_name}, even"
+                        f"Error, radiation is not applied to:{node_name}, even"
                         + f" though it is in:{dead_neuron_names}"
                     )
     else:
