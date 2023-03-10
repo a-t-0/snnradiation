@@ -94,7 +94,7 @@ class Radiation_damage:
         """
         for node_name in dead_node_names:
             if node_name in dead_node_names:
-                get_degree.nodes[node_name]["nx_lif"][0].vth.set(9999)
+                get_degree.nodes[node_name]["nx_lif"][0].vth.set(9999999999)
 
 
 @typechecked
@@ -132,7 +132,10 @@ def verify_radiation_is_applied(
                     raise ValueError(
                         'Error, G.nodes[node_name]["rad_death"] not set'
                     )
-                if some_graph.nodes[node_name]["nx_lif"][0].vth.get() != 9999:
+                if (
+                    some_graph.nodes[node_name]["nx_lif"][0].vth.get()
+                    != 9999999999
+                ):
                     raise ValueError(
                         f"Error, radiation is not applied to:{node_name}, even"
                         + f" though it is in:{dead_neuron_names}"
