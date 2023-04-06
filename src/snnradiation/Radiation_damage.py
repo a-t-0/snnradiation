@@ -23,7 +23,7 @@ class Radiation_damage:
 
     @typechecked
     def inject_simulated_radiation(
-        self, get_degree: nx.DiGraph, probability: float, seed: int
+        self, snn_graph: nx.DiGraph, probability: float, seed: int
     ) -> List[str]:
         """
 
@@ -32,51 +32,18 @@ class Radiation_damage:
 
         """
         # Get random neurons from list.
-        dead_neuron_names = self.get_random_neurons(
-            get_degree, probability, seed
+        dead_neuron_names = get_random_neurons(
+            neuron_names=list(snn_graph.nodes),
+            probability=probability,
+            seed=seed,
         )
 
         store_dead_neuron_names_in_graph(
-            G=get_degree, dead_neuron_names=dead_neuron_names
+            G=snn_graph, dead_neuron_names=dead_neuron_names
         )
 
         # Kill neurons.
-        self.kill_neurons(get_degree, dead_neuron_names)
-
-        return dead_neuron_names
-
-    @typechecked
-    def get_random_neurons(
-        self, get_degree: nx.DiGraph, probability: float, seed: int
-    ) -> List[str]:
-        """
-
-        :param get_degree: Graph with the MDSA SNN approximation solution.
-        :param probability:
-        :param adaptation_only:  (Default value = False)
-
-        """
-
-        # TODO: restore the probabilitiy  of firing instead of getting fraction
-        # of neurons.
-        nr_of_dead_neurons = int(len(get_degree) * probability)
-
-        random.seed(seed)
-        # Get a list of length nr_of_dead_neurons with random integers
-        # These integers indicate which neurons die.
-
-        rand_indices = random.sample(
-            range(0, len(get_degree)), nr_of_dead_neurons
-        )
-
-        dead_neuron_names = []
-        # TODO: fold instead of for.
-        count = 0
-        for node_name in get_degree:
-            # for i,node_name in enumerate(get_degree):
-            if count in rand_indices:
-                dead_neuron_names.append(node_name)
-            count = count + 1
+        self.kill_neurons(snn_graph, dead_neuron_names)
 
         return dead_neuron_names
 
@@ -95,6 +62,44 @@ class Radiation_damage:
         for node_name in dead_node_names:
             if node_name in dead_node_names:
                 get_degree.nodes[node_name]["nx_lif"][0].vth.set(9999999999)
+
+
+@typechecked
+def get_random_neurons(
+    *, neuron_names: List[str], probability: float, seed: int
+) -> List[str]:
+    """
+
+    :param get_degree: Graph with the MDSA SNN approximation solution.
+    :param probability:
+    :param adaptation_only:  (Default value = False)
+
+    """
+
+    # TODO: restore the probabilitiy  of firing instead of getting fraction
+    # of neurons.
+    nr_of_dead_neurons: int = int(len(neuron_names) * probability)
+
+    # Set the random seed to get consistent dead neuron names.
+    random.seed(seed)
+    # Get a list of length nr_of_dead_neurons with random integers
+    # These integers indicate which neurons die.
+
+    rand_indices = random.sample(
+        range(0, len(neuron_names)), nr_of_dead_neurons
+    )
+
+    dead_neuron_names: List[str] = []
+
+    # TODO: fold instead of for.
+    count: int = 0
+    for node_name in neuron_names:
+        # for i,node_name in enumerate(get_degree):
+        if count in rand_indices:
+            dead_neuron_names.append(node_name)
+        count += 1
+
+    return dead_neuron_names
 
 
 @typechecked
