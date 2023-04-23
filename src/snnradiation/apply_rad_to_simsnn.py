@@ -1,14 +1,15 @@
 """Applies the radiation settings to the simsnn."""
-from pprint import pprint
-from typing import List
+from typing import List, Tuple
 
 from simsnn.core.networks import Network
 from simsnn.core.nodes import LIF, RandomSpiker
 from simsnn.core.simulators import Simulator
+from typeguard import typechecked
 
 from snnradiation.Rad_damage import Rad_damage
 
 
+@typechecked
 def apply_rad_to_simsnn(
     rad: Rad_damage,
     snn: Simulator,
@@ -56,6 +57,7 @@ def apply_rad_to_simsnn(
         )
 
 
+@typechecked
 def apply_delta_u_rad(
     rad: Rad_damage, snn: Simulator, ignored_neuron_names: List[str]
 ) -> None:
@@ -68,8 +70,10 @@ def apply_delta_u_rad(
         - spikes with synaptic weight = specified radiation amplitude.
         - spikes with specified probability (per timestep)
     """
-    pprint(snn.__dict__)
     net: Network = snn.network
+    new_nodes: List[Tuple[RandomSpiker, LIF]] = []
+
+    # First get the new nodes that need to be added.
     for node in snn.network.nodes:
         if node.name not in ignored_neuron_names:
             # Create new neuron that randomly spikes.
@@ -79,17 +83,22 @@ def apply_delta_u_rad(
             rand_spiking_node = RandomSpiker(
                 p=rad.probability_per_t, amplitude=1
             )
-            net.nodes.append(rand_spiking_node)
+            new_nodes.append((rand_spiking_node, node))
 
-            # Create new synapse into original neuron.
-            net.createSynapse(
-                pre=rand_spiking_node,
-                post=node.name,
-                w=rad.amplitude,
-                d=1,
-            )
+    # Add the new nodes. Done in separate loop to prevent rand_spiking neurons
+    # from getting rand_spiking_neurons.
+    for rand_spiking_node, target_node in new_nodes:
+        net.nodes.append(rand_spiking_node)
+        # Create new synapse into original neuron.
+        net.createSynapse(
+            pre=rand_spiking_node,
+            post=target_node,
+            w=rad.amplitude,
+            d=1,
+        )
 
 
+@typechecked
 def apply_rand_spiking_neuron_rad(
     rad: Rad_damage,
     snn: Simulator,
@@ -105,6 +114,8 @@ def apply_rand_spiking_neuron_rad(
         - spikes with specified probability (per timestep)
     """
     net: Network = snn.network
+    new_nodes: List[Tuple[RandomSpiker, List[Tuple[LIF, float]]]] = []
+
     for node in snn.network.nodes:
         if node.name not in ignored_neuron_names:
             # Create new neuron that randomly spikes.
@@ -113,21 +124,27 @@ def apply_rand_spiking_neuron_rad(
             rand_spiking_node = RandomSpiker(
                 p=rad.probability_per_t, amplitude=1
             )
-            net.nodes.append(rand_spiking_node)
 
             # Create new synapses into outgoing neighbours of original neuron.
+            neighbours: List[Tuple[LIF, float]] = []
             for synapse in net.synapses:
                 if synapse.pre == node.name:
-                    neighbour: LIF = synapse.post
+                    neighbours.append((synapse.post, synapse.w))
 
-                    net.createSynapse(
-                        pre=rand_spiking_node,
-                        post=neighbour,
-                        w=synapse.w,
-                        d=1,
-                    )
+            new_nodes.append((rand_spiking_node, neighbours))
+
+    for rand_spiking_node, (target_nodes, synapse_weight) in new_nodes:
+        net.nodes.append(rand_spiking_node)
+        for neighbour in target_nodes:
+            net.createSynapse(
+                pre=rand_spiking_node,
+                post=neighbour,
+                w=synapse_weight,
+                d=1,
+            )
 
 
+@typechecked
 def apply_rand_spiking_synapse_rad(
     rad: Rad_damage, snn: Simulator, ignored_neuron_names: List[str]
 ) -> None:
@@ -141,6 +158,7 @@ def apply_rand_spiking_synapse_rad(
         - spikes with specified probability (per timestep).
     """
     net: Network = snn.network
+    new_synapses: List[Tuple[RandomSpiker, LIF, float]] = []
     for synapse in net.synapses:
         if synapse.pre.name not in ignored_neuron_names:
             # Create new neuron that randomly spikes.
@@ -149,14 +167,14 @@ def apply_rand_spiking_synapse_rad(
             rand_spiking_node = RandomSpiker(
                 p=rad.probability_per_t, amplitude=1
             )
-            net.nodes.append(rand_spiking_node)
+            new_synapses.append((rand_spiking_node, synapse.post, synapse.w))
 
-            # Create new synapses into outgoing neighbours of original neuron.
-            neighbour: LIF = synapse.post
-
-            net.createSynapse(
-                pre=rand_spiking_node,
-                post=neighbour,
-                w=synapse.w,
-                d=1,
-            )
+    for rand_spiking_node, neighbour, synapse_weight in new_synapses:
+        net.nodes.append(rand_spiking_node)
+        # Create new synapses into outgoing neighbours of original neuron.
+        net.createSynapse(
+            pre=rand_spiking_node,
+            post=neighbour,
+            w=synapse_weight,
+            d=1,
+        )
