@@ -68,10 +68,9 @@ class Rad_damage:
         neuron names."""
         neuron_names.append(self.get_rad_settings_hash())
         neuron_names.append(str(seed))
-
         rad_affected_neurons_hash: str = str(
             hashlib.sha256(
-                json.dumps(neuron_names).encode("utf-8")
+                json.dumps(sorted(neuron_names)).encode("utf-8")
             ).hexdigest()
         )
         return rad_affected_neurons_hash
