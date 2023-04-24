@@ -1,6 +1,8 @@
 """Applies the radiation settings to the simsnn."""
+from pprint import pprint
 from typing import List, Tuple
 
+from simsnn.core.connections import Synapse
 from simsnn.core.networks import Network
 from simsnn.core.nodes import LIF, RandomSpiker
 from simsnn.core.simulators import Simulator
@@ -126,20 +128,21 @@ def apply_rand_spiking_neuron_rad(
             )
 
             # Create new synapses into outgoing neighbours of original neuron.
-            neighbours: List[Tuple[LIF, float]] = []
+            neighbour_synapses: List[Synapse] = []
             for synapse in net.synapses:
-                if synapse.pre == node.name:
-                    neighbours.append((synapse.post, synapse.w))
+                if synapse.pre.name == node.name:
+                    neighbour_synapses.append(synapse)
 
-            new_nodes.append((rand_spiking_node, neighbours))
+            new_nodes.append((rand_spiking_node, neighbour_synapses))
 
-    for rand_spiking_node, (target_nodes, synapse_weight) in new_nodes:
+    pprint(new_nodes)
+    for rand_spiking_node, synapses in new_nodes:
         net.nodes.append(rand_spiking_node)
-        for neighbour in target_nodes:
+        for synapse in synapses:
             net.createSynapse(
                 pre=rand_spiking_node,
-                post=neighbour,
-                w=synapse_weight,
+                post=synapse.post,
+                w=synapse.w,
                 d=1,
             )
 
@@ -158,7 +161,8 @@ def apply_rand_spiking_synapse_rad(
         - spikes with specified probability (per timestep).
     """
     net: Network = snn.network
-    new_synapses: List[Tuple[RandomSpiker, LIF, float]] = []
+    new_synapses: List[Tuple[RandomSpiker, Synapse]] = []
+
     for synapse in net.synapses:
         if synapse.pre.name not in ignored_neuron_names:
             # Create new neuron that randomly spikes.
@@ -167,14 +171,14 @@ def apply_rand_spiking_synapse_rad(
             rand_spiking_node = RandomSpiker(
                 p=rad.probability_per_t, amplitude=1
             )
-            new_synapses.append((rand_spiking_node, synapse.post, synapse.w))
+            new_synapses.append((rand_spiking_node, synapse))
 
-    for rand_spiking_node, neighbour, synapse_weight in new_synapses:
+    for rand_spiking_node, synapse in new_synapses:
         net.nodes.append(rand_spiking_node)
         # Create new synapses into outgoing neighbours of original neuron.
         net.createSynapse(
             pre=rand_spiking_node,
-            post=neighbour,
-            w=synapse_weight,
+            post=synapse.post,
+            w=synapse.w,
             d=1,
         )
