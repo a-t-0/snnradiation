@@ -75,3 +75,10 @@ class Rad_damage:
             ).hexdigest()
         )
         return rad_affected_neurons_hash
+
+
+def list_of_hashes_to_hash(hashes: List[str]) -> str:
+    """Converts a list of hashes into a new hash."""
+    return str(
+        hashlib.sha256(json.dumps(sorted(hashes)).encode("utf-8")).hexdigest()
+    )
