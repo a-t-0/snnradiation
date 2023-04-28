@@ -1,5 +1,4 @@
 """Applies the radiation settings to the simsnn."""
-from pprint import pprint
 from typing import List, Tuple
 
 from simsnn.core.connections import Synapse
@@ -135,7 +134,6 @@ def apply_rand_spiking_neuron_rad(
 
             new_nodes.append((rand_spiking_node, neighbour_synapses))
 
-    pprint(new_nodes)
     for rand_spiking_node, synapses in new_nodes:
         net.nodes.append(rand_spiking_node)
         for synapse in synapses:
