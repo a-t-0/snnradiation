@@ -78,7 +78,6 @@ def apply_delta_u_rad(
     for node in snn.network.nodes:
         if node.name not in ignored_neuron_names:
             # Create new neuron that randomly spikes.
-            # neuron = net.createLIF(ID="ln", thr=1, V_reset=0, m=1)
             # The amplitude in the rand_spiking node is the voltage spike, not
             # the output synapse spike.
             rand_spiking_node = RandomSpiker(
