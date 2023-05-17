@@ -50,14 +50,18 @@ class Rad_damage:
             raise NotImplementedError(f"Error, {effect_type} not implemented.")
 
     @typechecked
-    def get_rad_settings_hash(self) -> str:
+    def get_hash(self) -> str:
         """Converts radiation settings into a hash."""
-        rad_settings: List[Tuple[str, Union[float, bool, str]]] = []
-        for key, value in self.__dict__.items():
-            rad_settings.append((key, value))
+        sorted_rad_settings_list: List[
+            Tuple[str, Union[float, bool, str]]
+        ] = []
+        for sorted_key in sorted(self.__dict__.keys()):
+            # rad_settings_list.append((key, value))
+            sorted_rad_settings_list.append(self.__dict__[sorted_key])
+
         rad_settings_hash: str = str(
             hashlib.sha256(
-                json.dumps(sorted(rad_settings)).encode("utf-8")
+                json.dumps(sorted_rad_settings_list).encode("utf-8")
             ).hexdigest()
         )
         return rad_settings_hash
@@ -66,7 +70,7 @@ class Rad_damage:
     def get_rad_hash(self, neuron_names: List[str], seed: int) -> str:
         """Return a deterministic hash of the radiation based on a list of
         neuron names."""
-        neuron_names.append(self.get_rad_settings_hash())
+        neuron_names.append(self.get_hash())
         neuron_names.append(str(seed))
         rad_affected_neurons_hash: str = str(
             hashlib.sha256(
