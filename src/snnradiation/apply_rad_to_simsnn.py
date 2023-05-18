@@ -1,5 +1,4 @@
 """Applies the radiation settings to the simsnn."""
-from pprint import pprint
 from typing import List, Tuple
 
 import numpy as np
@@ -89,7 +88,6 @@ def apply_delta_u_rad(
     # First get the new nodes that need to be added.
     for i, node in enumerate(snn.network.nodes):
         if node.name not in ignored_neuron_names:
-            pprint(rad.__dict__)
             # Create new neuron that randomly spikes.
             # The amplitude in the rand_spiking node is the voltage spike, not
             # the output synapse spike.
