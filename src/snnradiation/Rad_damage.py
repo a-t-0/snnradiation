@@ -64,7 +64,6 @@ class Rad_damage:
                 json.dumps(sorted_rad_settings_list).encode("utf-8")
             ).hexdigest()
         )
-        print(f"rad_settings_hash=     {rad_settings_hash}")
         return rad_settings_hash
 
     @typechecked
