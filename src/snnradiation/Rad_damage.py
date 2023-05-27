@@ -79,6 +79,16 @@ class Rad_damage:
         )
         return rad_affected_neurons_hash
 
+    @typechecked
+    def get_filename(self) -> str:
+        """Returns a filename string."""
+        return (
+            f"{self.effect_type}_"
+            + f"ex:{self.excitatory}_"
+            + f"in_h:{self.amplitude}_"
+            + f"prob:{self.probability_per_t}_"
+        )
+
 
 def list_of_hashes_to_hash(hashes: List[str]) -> str:
     """Converts a list of hashes into a new hash."""
