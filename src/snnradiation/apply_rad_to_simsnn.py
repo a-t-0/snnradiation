@@ -197,3 +197,17 @@ def apply_rand_spiking_synapse_rad(
             w=synapse.w,
             d=1,
         )
+
+
+@typechecked
+def get_and_neuron(*, net: Network) -> LIF:
+    """Creates a neuron that spikes if it receives an input of 2."""
+    and_neuron = net.createLIF(
+        ID="and",
+        bias=0,
+        du=1.0,
+        m=0.0,
+        thr=2,
+        V_reset=0,
+    )
+    return and_neuron

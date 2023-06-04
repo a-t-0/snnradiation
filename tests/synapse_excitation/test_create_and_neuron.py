@@ -5,8 +5,11 @@ import itertools
 import unittest
 
 from simsnn.core.networks import Network
+from simsnn.core.nodes import LIF
 from simsnn.core.simulators import Simulator
 from typeguard import typechecked
+
+from snnradiation.apply_rad_to_simsnn import get_and_neuron
 
 
 class Test_and_neuron(unittest.TestCase):
@@ -81,7 +84,7 @@ class Test_and_neuron(unittest.TestCase):
         ]
         sim_duration: int = len(left_train)
         # Create simsnn network of 2 neurons.
-        testnet: Simulator = create_sample_network_with_and_neuron(
+        testnet = create_sample_network_with_and_neuron(
             left_train=left_train,
             right_train=right_train,
         )
@@ -171,14 +174,7 @@ def create_sample_network_with_and_neuron(
     )
     # right_train = net.createInputTrain(train=the_train, loop=False, ID="pn")
 
-    and_neuron = net.createLIF(
-        ID="and",
-        bias=0,
-        du=1.0,
-        m=0.0,
-        thr=2,
-        V_reset=0,
-    )
+    and_neuron: LIF = get_and_neuron(net=net)
 
     net.createSynapse(
         pre=left_train,
