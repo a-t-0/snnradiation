@@ -22,7 +22,7 @@ class Rad_damage:
         excitatory: bool,
         inhibitory: bool,
         probability_per_t: float,
-        nr_of_synaptic_weight_increases: Optional[int],
+        nr_of_synaptic_weight_increases: Optional[int] = None,
     ) -> None:
         self.amplitude: float = amplitude
         self.effect_type: str = effect_type

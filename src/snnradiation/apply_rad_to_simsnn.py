@@ -1,7 +1,7 @@
 """Applies the radiation settings to the simsnn."""
 from typing import List, Tuple
 
-from simsnn.core.connections import Synapse
+from simsnn.core.connections import Synapse, Synaptic_rad
 from simsnn.core.networks import Network
 from simsnn.core.nodes import LIF, RandomSpiker
 from simsnn.core.simulators import Simulator
@@ -180,3 +180,45 @@ def apply_rand_spiking_synapse_rad(
             w=synapse.w,
             d=1,
         )
+
+
+@typechecked
+def apply_synapse_weight_increase_rad(
+    *,
+    est_sim_duration: int,
+    ignored_neuron_names: List[str],
+    rad: Rad_damage,
+    seed: int,
+    snn: Simulator,
+) -> None:
+    """Modifies the snn to swap the synapses out with the synapses with
+    radiation."""
+    net: Network = snn.network
+    if rad.nr_of_synaptic_weight_increases is None:
+        raise ValueError(
+            "Expected a specification of the nr of synaptic weight increases."
+        )
+
+    # Convert the radiation object into a Synaptic_rad object.
+    synaptic_rad = Synaptic_rad(
+        avg_weight_increase=rad.amplitude,
+        est_sim_duration=est_sim_duration,
+        n_synapses=len(snn.network.synapses),
+        nswi=rad.nr_of_synaptic_weight_increases,
+        seed=seed,
+    )
+
+    for synapse in snn.network.synapses:
+        if (
+            synapse.pre.name not in ignored_neuron_names
+            and synapse.post.name not in ignored_neuron_names
+        ):
+            # Replace the existing synapse with a radiated synapse.
+            new_synapse: Synapse = net.createSynapse(
+                pre=synapse.pre,
+                post=synapse.post,
+                w=synapse.w,
+                d=synapse.d,
+                radiation=synaptic_rad,
+            )
+            synapse = new_synapse
