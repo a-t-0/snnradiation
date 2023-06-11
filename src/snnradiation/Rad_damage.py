@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from typeguard import typechecked
 
@@ -22,11 +22,18 @@ class Rad_damage:
         excitatory: bool,
         inhibitory: bool,
         probability_per_t: float,
+        nr_of_synaptic_weight_increases: Optional[int],
     ) -> None:
         self.amplitude: float = amplitude
         self.effect_type: str = effect_type
         self.excitatory: bool = excitatory
         self.inhibitory: bool = inhibitory
+        if nr_of_synaptic_weight_increases is None:
+            self.nr_of_synaptic_weight_increases: Union[None, int] = None
+        else:
+            self.nr_of_synaptic_weight_increases = (
+                nr_of_synaptic_weight_increases
+            )
 
         # Verify probability is within range.
         if probability_per_t > 1:
@@ -46,6 +53,7 @@ class Rad_damage:
             "neuron_death",
             "rand_neuron_spike",
             "rand_synapse_spike",
+            "change_synaptic_weight",
         ]:
             raise NotImplementedError(f"Error, {effect_type} not implemented.")
 
