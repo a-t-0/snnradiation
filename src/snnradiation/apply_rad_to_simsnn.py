@@ -193,8 +193,10 @@ def apply_synapse_weight_increase_rad(
 ) -> None:
     """Modifies the snn to swap the synapses out with the synapses with
     radiation."""
-    net: Network = snn.network
-    if rad.nr_of_synaptic_weight_increases is None:
+    if (
+        rad.nr_of_synaptic_weight_increases is None
+        and rad.probability_per_t is None
+    ):
         raise ValueError(
             "Expected a specification of the nr of synaptic weight increases."
         )
@@ -205,16 +207,18 @@ def apply_synapse_weight_increase_rad(
         est_sim_duration=est_sim_duration,
         n_synapses=len(snn.network.synapses),
         nswi=rad.nr_of_synaptic_weight_increases,
+        probability_per_t=rad.probability_per_t,
         seed=seed,
     )
 
-    for synapse in snn.network.synapses:
+    for count, synapse in enumerate(snn.network.synapses):
         if (
             synapse.pre.name not in ignored_neuron_names
             and synapse.post.name not in ignored_neuron_names
         ):
+            print(f"count = {count}/{len(snn.network.synapses)}")
             # Replace the existing synapse with a radiated synapse.
-            new_synapse: Synapse = net.createSynapse(
+            new_synapse: Synapse = Synapse(
                 pre=synapse.pre,
                 post=synapse.post,
                 w=synapse.w,
@@ -222,3 +226,5 @@ def apply_synapse_weight_increase_rad(
                 radiation=synaptic_rad,
             )
             synapse = new_synapse
+            print(f"{count}:synapse.radiation={synapse.radiation}")
+    print(snn.network.synapses[0].radiation)
