@@ -225,6 +225,6 @@ def apply_synapse_weight_increase_rad(
                 d=synapse.d,
                 radiation=synaptic_rad,
             )
-            synapse = new_synapse
-            print(f"{count}:synapse.radiation={synapse.radiation}")
-    print(snn.network.synapses[0].radiation)
+            # new_synapse.ID=snn.network.synapses[count].ID
+            new_synapse.ID = count
+            snn.network.synapses[count] = new_synapse
