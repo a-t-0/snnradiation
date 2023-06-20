@@ -216,7 +216,6 @@ def apply_synapse_weight_increase_rad(
             synapse.pre.name not in ignored_neuron_names
             and synapse.post.name not in ignored_neuron_names
         ):
-            print(f"count = {count}/{len(snn.network.synapses)}")
             # Replace the existing synapse with a radiated synapse.
             new_synapse: Synapse = Synapse(
                 pre=synapse.pre,
