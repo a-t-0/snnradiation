@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from typeguard import typechecked
 
@@ -21,43 +21,76 @@ class Rad_damage:
         effect_type: str,
         excitatory: bool,
         inhibitory: bool,
-        probability_per_t: float,
+        probability_per_t: Optional[float] = None,
+        nr_of_synaptic_weight_increases: Optional[int] = None,
     ) -> None:
         self.amplitude: float = amplitude
         self.effect_type: str = effect_type
         self.excitatory: bool = excitatory
         self.inhibitory: bool = inhibitory
+        if (
+            nr_of_synaptic_weight_increases is None
+            and probability_per_t is None
+        ):
+            raise ValueError(
+                "Error, need some form of simulated radiation effect "
+                + "probability."
+            )
+        if (
+            nr_of_synaptic_weight_increases is not None
+            and probability_per_t is not None
+        ):
+            raise ValueError(
+                "Error, can not manage 2 different forms of simulated "
+                + "radiation effect probability."
+            )
 
-        # Verify probability is within range.
-        if probability_per_t > 1:
-            raise ValueError(
-                "Error, radiation effect probability can't be larger than 1."
-                f" Found:{probability_per_t}"
+        if nr_of_synaptic_weight_increases is None:
+            self.nr_of_synaptic_weight_increases: Union[None, int] = None
+        else:
+            self.nr_of_synaptic_weight_increases = (
+                nr_of_synaptic_weight_increases
             )
-        if probability_per_t < 0:
-            raise ValueError(
-                "Error, radiation effect probability can't be smaller than 0."
-                f" Found:{probability_per_t}"
-            )
-        self.probability_per_t: float = probability_per_t
+
+        if probability_per_t is None:
+            self.probability_per_t: Union[None, float] = None
+        else:
+            self.probability_per_t = probability_per_t
+
+            # Verify probability is within range.
+            if probability_per_t > 1:
+                raise ValueError(
+                    "Error, radiation effect probability can't be larger than"
+                    + f"1. Found:{probability_per_t}"
+                )
+            if probability_per_t < 0:
+                raise ValueError(
+                    "Error, radiation effect probability can't be smaller than"
+                    + f" 0. Found:{probability_per_t}"
+                )
 
         if effect_type not in [
             "change_u",
             "neuron_death",
             "rand_neuron_spike",
             "rand_synapse_spike",
+            "change_synaptic_weight",
         ]:
             raise NotImplementedError(f"Error, {effect_type} not implemented.")
 
     @typechecked
-    def get_rad_settings_hash(self) -> str:
+    def get_hash(self) -> str:
         """Converts radiation settings into a hash."""
-        rad_settings: List[Tuple[str, Union[float, bool, str]]] = []
-        for key, value in self.__dict__.items():
-            rad_settings.append((key, value))
+        sorted_rad_settings_list: List[
+            Tuple[str, Union[float, bool, str]]
+        ] = []
+        for sorted_key in sorted(self.__dict__.keys()):
+            # rad_settings_list.append((key, value))
+            sorted_rad_settings_list.append(self.__dict__[sorted_key])
+
         rad_settings_hash: str = str(
             hashlib.sha256(
-                json.dumps(sorted(rad_settings)).encode("utf-8")
+                json.dumps(sorted_rad_settings_list).encode("utf-8")
             ).hexdigest()
         )
         return rad_settings_hash
@@ -66,7 +99,7 @@ class Rad_damage:
     def get_rad_hash(self, neuron_names: List[str], seed: int) -> str:
         """Return a deterministic hash of the radiation based on a list of
         neuron names."""
-        neuron_names.append(self.get_rad_settings_hash())
+        neuron_names.append(self.get_hash())
         neuron_names.append(str(seed))
         rad_affected_neurons_hash: str = str(
             hashlib.sha256(
@@ -74,6 +107,16 @@ class Rad_damage:
             ).hexdigest()
         )
         return rad_affected_neurons_hash
+
+    @typechecked
+    def get_filename(self) -> str:
+        """Returns a filename string."""
+        return (
+            f"{self.effect_type}_"
+            + f"ex:{self.excitatory}_"
+            + f"in_h:{self.amplitude}_"
+            + f"prob:{self.probability_per_t}_"
+        )
 
 
 def list_of_hashes_to_hash(hashes: List[str]) -> str:
