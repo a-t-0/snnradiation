@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from typeguard import typechecked
 
@@ -21,31 +21,60 @@ class Rad_damage:
         effect_type: str,
         excitatory: bool,
         inhibitory: bool,
-        probability_per_t: float,
+        probability_per_t: Optional[float] = None,
+        nr_of_synaptic_weight_increases: Optional[int] = None,
     ) -> None:
         self.amplitude: float = amplitude
         self.effect_type: str = effect_type
         self.excitatory: bool = excitatory
         self.inhibitory: bool = inhibitory
+        if (
+            nr_of_synaptic_weight_increases is None
+            and probability_per_t is None
+        ):
+            raise ValueError(
+                "Error, need some form of simulated radiation effect "
+                + "probability."
+            )
+        if (
+            nr_of_synaptic_weight_increases is not None
+            and probability_per_t is not None
+        ):
+            raise ValueError(
+                "Error, can not manage 2 different forms of simulated "
+                + "radiation effect probability."
+            )
 
-        # Verify probability is within range.
-        if probability_per_t > 1:
-            raise ValueError(
-                "Error, radiation effect probability can't be larger than 1."
-                f" Found:{probability_per_t}"
+        if nr_of_synaptic_weight_increases is None:
+            self.nr_of_synaptic_weight_increases: Union[None, int] = None
+        else:
+            self.nr_of_synaptic_weight_increases = (
+                nr_of_synaptic_weight_increases
             )
-        if probability_per_t < 0:
-            raise ValueError(
-                "Error, radiation effect probability can't be smaller than 0."
-                f" Found:{probability_per_t}"
-            )
-        self.probability_per_t: float = probability_per_t
+
+        if probability_per_t is None:
+            self.probability_per_t: Union[None, float] = None
+        else:
+            self.probability_per_t = probability_per_t
+
+            # Verify probability is within range.
+            if probability_per_t > 1:
+                raise ValueError(
+                    "Error, radiation effect probability can't be larger than"
+                    + f"1. Found:{probability_per_t}"
+                )
+            if probability_per_t < 0:
+                raise ValueError(
+                    "Error, radiation effect probability can't be smaller than"
+                    + f" 0. Found:{probability_per_t}"
+                )
 
         if effect_type not in [
             "change_u",
             "neuron_death",
             "rand_neuron_spike",
             "rand_synapse_spike",
+            "change_synaptic_weight",
         ]:
             raise NotImplementedError(f"Error, {effect_type} not implemented.")
 
