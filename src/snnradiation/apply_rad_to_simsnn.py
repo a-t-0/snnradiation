@@ -1,10 +1,8 @@
 """Applies the radiation settings to the simsnn."""
 from typing import List, Tuple
 
-
-from simsnn.core.connections import Synapse, Synaptic_rad
 import numpy as np
-
+from simsnn.core.connections import Synapse, Synaptic_rad
 from simsnn.core.networks import Network
 from simsnn.core.nodes import LIF, RandomSpiker
 from simsnn.core.simulators import Simulator
@@ -48,7 +46,7 @@ def apply_rad_to_simsnn(
 
     - Random synapse death is not implemented.
     """
-    if rad.effect_type in ["change_u", "neuron_death"]:
+    if rad.effect_type == "change_u":
         apply_delta_u_rad(
             rad=rad,
             seed=seed,
@@ -95,7 +93,7 @@ def apply_delta_u_rad(
             # the output synapse spike.
             rand_spiking_node = RandomSpiker(
                 p=rad.probability_per_t,
-                amplitude=1,
+                amplitude=-10000,
                 rng=np.random.default_rng(seed=seed + i),
             )
             new_nodes.append((rand_spiking_node, node))
@@ -220,11 +218,15 @@ def apply_synapse_weight_increase_rad(
             "Expected a specification of the nr of synaptic weight increases."
         )
 
+    for i, node in enumerate(snn.network.nodes):
+        print(f"i={i}: {node.name}")
     # Convert the radiation object into a Synaptic_rad object.
     synaptic_rad = Synaptic_rad(
         avg_weight_increase=rad.amplitude,
+        effect_type=rad.effect_type,
         est_sim_duration=est_sim_duration,
         n_synapses=len(snn.network.synapses),
+        neuron_names=list(map(lambda node: node.name, snn.network.nodes)),
         nswi=rad.nr_of_synaptic_weight_increases,
         probability_per_t=rad.probability_per_t,
         seed=seed,
@@ -247,6 +249,7 @@ def apply_synapse_weight_increase_rad(
             new_synapse.ID = count
             snn.network.synapses[count] = new_synapse
 
+
 def get_and_neuron(*, net: Network) -> LIF:
     """Creates a neuron that spikes if it receives an input of 2."""
     and_neuron = net.createLIF(
@@ -258,4 +261,3 @@ def get_and_neuron(*, net: Network) -> LIF:
         V_reset=0,
     )
     return and_neuron
-
