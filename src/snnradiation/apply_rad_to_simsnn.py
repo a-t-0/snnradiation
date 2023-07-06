@@ -218,8 +218,6 @@ def apply_synapse_weight_increase_rad(
             "Expected a specification of the nr of synaptic weight increases."
         )
 
-    for i, node in enumerate(snn.network.nodes):
-        print(f"i={i}: {node.name}")
     # Convert the radiation object into a Synaptic_rad object.
     synaptic_rad = Synaptic_rad(
         avg_weight_increase=rad.amplitude,
