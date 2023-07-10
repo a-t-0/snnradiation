@@ -1,5 +1,4 @@
 """Applies the radiation settings to the simsnn."""
-import copy
 from typing import List, Tuple
 
 import numpy as np
@@ -231,8 +230,7 @@ def apply_synapse_weight_increase_rad(
         seed=seed,
     )
 
-    copied_synapses = copy.deepcopy(snn.network.synapses)
-    for count, synapse in enumerate(copied_synapses):
+    for count, synapse in enumerate(snn.network.synapses):
         if (
             synapse.pre.name not in ignored_neuron_names
             and synapse.post.name not in ignored_neuron_names
