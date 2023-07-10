@@ -115,7 +115,7 @@ class Rad_damage:
             f"{self.effect_type}_"
             + f"ex:{self.excitatory}_"
             + f"in_h:{self.amplitude}_"
-            # + f"prob:{self.probability_per_t}_"
+            + f"prob:{self.probability_per_t}_"
         )
 
 
